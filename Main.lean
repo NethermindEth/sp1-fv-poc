@@ -31,34 +31,8 @@ lemma sp1_addOperation
   -- constrains not required as implied by the other constraints
   clear C01 C02 C03 C14
 
-  rcases C11 with ⟨C11⟩ | ⟨C11⟩ <;>
-  rcases C12 with ⟨C12⟩ | ⟨C12⟩ <;>
-  rcases C13 with ⟨C13⟩ | ⟨C13⟩ <;>
-  subst V12 <;> subst V13 <;> subst V14 <;> simp at * <;>
-  ( try rcases C04 with ⟨C04⟩ | ⟨C04⟩ ) <;>
-  ( try rcases C05 with ⟨C05⟩ | ⟨C05⟩ ) <;>
-  ( try rcases C06 with ⟨C06⟩ | ⟨C06⟩ ) <;>
-  ( try rcases C07 with ⟨C07⟩ | ⟨C07⟩ ) <;>
-  ( try rcases C08 with ⟨C08⟩ | ⟨C08⟩ ) <;>
-  ( try rcases C09 with ⟨C09⟩ | ⟨C09⟩ ) <;>
-  ( try rcases C10 with ⟨C10⟩ | ⟨C10⟩ ) <;>
-  ( try apply bb_to_subst_eq_01 at C04 <;> try simp ) <;>
-  ( try apply bb_to_subst_eq_01 at C05 <;> try simp ) <;>
-  ( try apply bb_to_subst_eq_01 at C06 <;> try simp ) <;>
-  ( try apply bb_to_subst_eq_01 at C07 <;> try simp ) <;>
-  ( try apply bb_to_subst_eq_01 at C08 <;> try simp ) <;>
-  ( try apply bb_to_subst_eq_01 at C09 <;> try simp ) <;>
-  ( try apply bb_to_subst_eq_01 at C10 <;> try simp ) <;>
-  ( try apply bb_to_subst_eq_02 at C04 <;> try simp ) <;>
-  ( try apply bb_to_subst_eq_02 at C06 <;> try simp ) <;>
-  ( try apply bb_to_subst_eq_02 at C07 <;> try simp ) <;>
-  ( try apply bb_to_subst_eq_02 at C09 <;> try simp ) <;>
-  ( try apply bb_to_subst_eq_02 at C10 <;> try simp ) <;>
-  subst_eqs
-
-  all_goals ( iterate ( rw [Fin.sub_def] at * ) <;> simp [BabyBearPrime] at * )
-  all_goals ( iterate ( rw [Fin.add_def] at * ) <;> simp [BabyBearPrime] at * )
-  all_goals ( try rw [@bb_val_ofNat 256] at * <;> try omega )
-  all_goals ( try simp )
-
-  rw [Nat.mod_eq_of_lt] at C23 C24 C25 C26 <;> omega
+  rcases C11 with C11 | C11 <;>
+  rcases C12 with C12 | C12 <;>
+  rcases C13 with C13 | C13 <;>
+  rcases C04 with C04 | C04 <;> subst_eqs <;>
+  simp [Fin.add_def, Fin.sub_def, ←sub_eq_zero, BabyBearPrime] at * <;> simp at * <;> omega
