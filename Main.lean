@@ -56,8 +56,8 @@ lemma sp1_addOperation
   ( try apply bb_to_subst_eq_02 at C10 <;> try simp ) <;>
   subst_eqs
 
-  all_goals ( iterate ( rw [Fin.sub_def] at * ) <;> simp [Bear] at * )
-  all_goals ( iterate ( rw [Fin.add_def] at * ) <;> simp [Bear] at * )
+  all_goals ( iterate ( rw [Fin.sub_def] at * ) <;> simp [BabyBearPrime] at * )
+  all_goals ( iterate ( rw [Fin.add_def] at * ) <;> simp [BabyBearPrime] at * )
   all_goals ( try rw [@bb_val_ofNat 256] at * <;> try omega )
   all_goals ( try simp )
 

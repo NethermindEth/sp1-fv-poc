@@ -1,14 +1,14 @@
 import Mathlib
 
-abbrev Bear : ℕ := 2013265921
-abbrev BabyBear : Type := Fin Bear
-instance : NeZero Bear := by constructor; decide
+abbrev BabyBearPrime : ℕ := 2013265921
+abbrev BabyBear : Type := Fin BabyBearPrime
+instance : NeZero BabyBearPrime := by constructor; decide
 
 @[simp]
-lemma lt_Bear : 256 < Bear := by decide
+lemma lt_Bear : 256 < BabyBearPrime := by decide
 
-lemma bb_val_ofNat {x : ℕ} (Hlt : x < Bear) :
-  ↑(@OfNat.ofNat (Fin Bear) x Fin.instOfNat) = x := by simpa [OfNat.ofNat]
+lemma bb_val_ofNat {x : ℕ} (Hlt : x < BabyBearPrime) :
+  ↑(@OfNat.ofNat (Fin BabyBearPrime) x Fin.instOfNat) = x := by simpa [OfNat.ofNat]
 
 lemma bb_to_subst_eq_01 {a b c d : BabyBear} (Heq : (a + b) - c = d) : c = a + b - d := by
   rw [←Heq, sub_sub_cancel]
