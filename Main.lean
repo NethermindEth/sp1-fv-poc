@@ -42,22 +42,23 @@ lemma sp1_addOperation
   ( try rcases C08 with ⟨C08⟩ | ⟨C08⟩ ) <;>
   ( try rcases C09 with ⟨C09⟩ | ⟨C09⟩ ) <;>
   ( try rcases C10 with ⟨C10⟩ | ⟨C10⟩ ) <;>
-  ( try apply bb_to_subst_eq_01 at C04 <;> ( try assumption ) <;> try simp ) <;>
-  ( try apply bb_to_subst_eq_01 at C05 <;> ( try assumption ) <;> try simp ) <;>
-  ( try apply bb_to_subst_eq_01 at C06 <;> ( try assumption ) <;> try simp ) <;>
-  ( try apply bb_to_subst_eq_01 at C07 <;> ( try assumption ) <;> try simp ) <;>
-  ( try apply bb_to_subst_eq_01 at C08 <;> ( try assumption ) <;> try simp ) <;>
-  ( try apply bb_to_subst_eq_01 at C09 <;> ( try assumption ) <;> try simp ) <;>
-  ( try apply bb_to_subst_eq_01 at C10 <;> ( try assumption ) <;> try simp ) <;>
-  ( try apply bb_to_subst_eq_02 at C04 <;> ( try assumption ) <;> try simp ) <;>
-  ( try apply bb_to_subst_eq_02 at C06 <;> ( try assumption ) <;> try simp ) <;>
-  ( try apply bb_to_subst_eq_02 at C07 <;> ( try assumption ) <;> try simp ) <;>
-  ( try apply bb_to_subst_eq_02 at C09 <;> ( try assumption ) <;> try simp ) <;>
-  ( try apply bb_to_subst_eq_02 at C10 <;> ( try assumption ) <;> try simp ) <;>
+  ( try apply bb_to_subst_eq_01 at C04 <;> try simp ) <;>
+  ( try apply bb_to_subst_eq_01 at C05 <;> try simp ) <;>
+  ( try apply bb_to_subst_eq_01 at C06 <;> try simp ) <;>
+  ( try apply bb_to_subst_eq_01 at C07 <;> try simp ) <;>
+  ( try apply bb_to_subst_eq_01 at C08 <;> try simp ) <;>
+  ( try apply bb_to_subst_eq_01 at C09 <;> try simp ) <;>
+  ( try apply bb_to_subst_eq_01 at C10 <;> try simp ) <;>
+  ( try apply bb_to_subst_eq_02 at C04 <;> try simp ) <;>
+  ( try apply bb_to_subst_eq_02 at C06 <;> try simp ) <;>
+  ( try apply bb_to_subst_eq_02 at C07 <;> try simp ) <;>
+  ( try apply bb_to_subst_eq_02 at C09 <;> try simp ) <;>
+  ( try apply bb_to_subst_eq_02 at C10 <;> try simp ) <;>
   subst_eqs
 
-  all_goals ( iterate ( rw [Fin.sub_def] at * ) <;> simp at * )
-  all_goals ( iterate ( rw [Fin.add_def] at * ) <;> simp at * )
+  all_goals ( iterate ( rw [Fin.sub_def] at * ) <;> simp [Bear] at * )
+  all_goals ( iterate ( rw [Fin.add_def] at * ) <;> simp [Bear] at * )
   all_goals ( try rw [@bb_val_ofNat 256] at * <;> try omega )
+  all_goals ( try simp )
 
   rw [Nat.mod_eq_of_lt] at C23 C24 C25 C26 <;> omega
