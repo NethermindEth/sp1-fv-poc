@@ -29,4 +29,5 @@ lemma sp1_addOperation
     ( V08.val + 256 * V09.val + 65536 * V10.val + 16777216 * V11.val )
      := by
   rcases C11 <;> rcases C12 <;> rcases C13 <;> subst_eqs <;>
-  simp [Fin.add_def, Fin.sub_def, ←sub_eq_zero, BabyBearPrime] at * <;> simp at * <;> omega
+  simp [BabyBearPrime, Fin.add_def, Fin.sub_def, ←(@sub_eq_zero BabyBear _ _ 256)] at * <;>
+  omega
