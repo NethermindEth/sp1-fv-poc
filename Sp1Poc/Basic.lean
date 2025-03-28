@@ -1,18 +1,13 @@
 import Mathlib
 
 abbrev BabyBearPrime : ℕ := 2013265921
-
-@[simp]
-axiom BabyBearPrimeIsPrime : Nat.Prime BabyBearPrime
+lemma prime_BabyBearPrime : Nat.Prime BabyBearPrime := by norm_num
 
 abbrev BabyBear : Type := Fin BabyBearPrime
+
 instance : NeZero BabyBearPrime := by constructor; decide
 
 instance : NoZeroDivisors BabyBear := by
-  constructor; intros a b Heq; rw [Fin.mul_def] at Heq; by_contra Hneq; simp at *
-  rw [@Fin.mk_eq_zero _ a] at Hneq; rw [@Fin.mk_eq_zero _ b] at Hneq
-  have Hncp_ab : ¬ Nat.Coprime BabyBearPrime (a.1 * b.1) := by
-    rw [← Nat.Prime.dvd_iff_not_coprime BabyBearPrimeIsPrime]; omega
-  apply Hncp_ab
-  apply Nat.Coprime.mul_right <;> apply Nat.coprime_of_lt_prime <;>
-  (try omega) <;> simp
+  have : IsDomain (ZMod BabyBearPrime) := ZMod.instIsDomain (hp := ⟨prime_BabyBearPrime⟩)
+  simp [ZMod] at this
+  infer_instance
