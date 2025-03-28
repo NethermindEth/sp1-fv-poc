@@ -1,6 +1,8 @@
 import Mathlib
 
 abbrev BabyBearPrime : ℕ := 2013265921
+
+@[simp]
 axiom BabyBearPrimeIsPrime : Nat.Prime BabyBearPrime
 
 abbrev BabyBear : Type := Fin BabyBearPrime
@@ -12,7 +14,5 @@ instance : NoZeroDivisors BabyBear := by
   have Hncp_ab : ¬ Nat.Coprime BabyBearPrime (a.1 * b.1) := by
     rw [← Nat.Prime.dvd_iff_not_coprime BabyBearPrimeIsPrime]; omega
   apply Hncp_ab
-  apply Nat.Coprime.mul_right <;> [
-    apply Nat.coprime_of_lt_prime <;> [ omega; exact a.2; exact BabyBearPrimeIsPrime ];
-    apply Nat.coprime_of_lt_prime <;> [ omega; exact b.2; exact BabyBearPrimeIsPrime ]
-  ]
+  apply Nat.Coprime.mul_right <;> apply Nat.coprime_of_lt_prime <;>
+  (try omega) <;> simp
