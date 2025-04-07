@@ -1,8 +1,10 @@
 import Sp1Poc
 import Lake
+import Lean
+
+open Lean
 
 namespace Sp1
-
 
 -- set_option maxHeartbeats 1000000
 -- lemma sp1_addOperation
@@ -39,40 +41,8 @@ namespace Sp1
 
 end Sp1
 
-namespace Sp1
-
-def RustFolder : System.FilePath := "./RustExtractor"
-
-open Lake in
-def cloneWithCache (dirname url : String) : LogIO Unit := do
-  let repoDir : GitRepo := ⟨(←IO.currentDir) / dirname⟩
-  if !(← repoDir.dir.pathExists) then IO.println s!"Cloning: {url}"; GitRepo.clone url repoDir
-
-def rustOutput : IO String := do
-  IO.println "Extracting constraints..."
-  IO.Process.run {
-    cwd := RustFolder / "air",
-    cmd := "cargo",
-    args := #["test", "--", "--nocapture"]
-  }
-
-protected def HelpMessage :=
-s!"Usage:
-If no arguments are given, we assume the rust extractor is located in {RustFolder}.
-
-We then run the extractor to obtain constraints and create a Lean file ready to specify and verify the circuit.
-
-Arguments:
-help  : Displays this message.
-<URL> : Clones the extractor from the Git repository at <URL> into {RustFolder}.
-           If the folder exists, acts as if no arguments were given.
-"
-end Sp1
-
 open Sp1 in
-def main : List String → IO Unit
-  | []    => rustOutput >>= λ output ↦ let x := templateOfRustOutput output; dbg_trace s!"{x}"; pure ()
-  | [arg] => if arg == "help"
-             then IO.println Sp1.HelpMessage
-             else (cloneWithCache "RustExtractor" arg).toBaseIO >>= λ _ ↦ main []
-  | _     => IO.println Sp1.HelpMessage
+unsafe def main (args : List String) : IO UInt32 := do
+  searchPathRef.set compile_time_search_path%
+  enableInitializersExecution
+  cli.validate args
