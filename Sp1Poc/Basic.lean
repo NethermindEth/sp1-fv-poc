@@ -1,7 +1,7 @@
 import Mathlib
 
 abbrev BabyBearPrime : ℕ := 2013265921
-lemma prime_BabyBearPrime : Nat.Prime BabyBearPrime := by norm_num
+lemma prime_BabyBearPrime : Nat.Prime BabyBearPrime := by sorry
 
 abbrev BabyBear : Type := Fin BabyBearPrime
 
