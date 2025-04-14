@@ -20,6 +20,14 @@ end Syntax
 section Elaborator
 
 /--
+  Note the syntax is parsed implicitly, as we are 'invoking' Lean's parser via description 
+  in the `section Syntax`. Thus, we allow a broad range of expressions.
+
+  `translateConstraint` then post-processes this information and rejects currently unsupported
+  formats.
+
+  Returns the underlying term as well as an array of bound variables occurring in the term.
+
   POC note.
 
   Bound variables only supported in cases where we support decoding.
@@ -58,16 +66,25 @@ private def translateConstraint (c : TSyntax `constraint) : Except String (Strin
   where strOfTerm  (t : Term)   : String := t.raw.prettyPrint.pretty
         strOfIdent (i : Syntax) : String := i.getId.toString
 
-instance : MonadLift IO (EIO String) := ⟨IO.toEIO (s!"{·}")⟩
-instance : MonadLift (EIO String) IO := ⟨EIO.toIO (s!"{·}")⟩
+section
 
+/-
+  In `Sp1`, we canonically translate between `Except.error` and `IO.Error`.
+-/
+scoped instance : MonadLift IO (EIO String) := ⟨IO.toEIO (s!"{·}")⟩
+scoped instance : MonadLift (EIO String) IO := ⟨EIO.toIO (s!"{·}")⟩
+
+end
+
+/--
+  Rust output parser frontend.
+
+  We run the constraiint parser on each individual constraint and return:
+  - `hyppotheses` is the set of hypotheses representing the set of polynomial constraints.
+  - `bvars` is the set of bound variables in these hypothses.
+-/
 def translateConstraints (input : String) : EIO String (Array String × Array String) :=
   let constraints := input.splitOn "\n"
-  /-
-    Run the parser on each individual constraint.
-    - `hyppotheses` is the set of hypotheses representing the set of polynomial constraints.
-    - `bvars` is the set of bound variables in these hypothses.
-  -/
   CoreM.withImportModules #[`Sp1Poc] do
     let mut bvars      := #[]
     let mut hypotheses := #[]
@@ -80,6 +97,15 @@ def translateConstraints (input : String) : EIO String (Array String × Array St
 
 end Elaborator
 
+/--
+  Returns a pair of:
+  - Lean theorem representing the ZK circuit as extracted by the rust module.
+  - Lean definition representing a specification of the circuit; set to `True`.
+
+  Runs in `StateM Nat` to uniquely identify lemmas we produce.
+  I am not exceedingly partial to this, we could conceivably simply name all of them the same
+  and then use a namespace that matches a given circuit's name.
+-/
 def defsOfConstraints (bvars : Array String) (constraints : Array String) : StateM Nat (String × String) := do
   let n ← getModify (·+1)
   pure (
@@ -103,11 +129,26 @@ def defsOfConstraints (bvars : Array String) (constraints : Array String) : Stat
         hypotheses := (·.pop) <| constraints.zipIdx.foldl (init := "") λ acc (hyp, i) ↦
                         acc++Indent++s!"(C{prettyHypName i}{i} : {hyp})\n"
 
+/--
+  Formats the target Lean file:
+  `imports`
+
+  `namespace Sp1`
+
+  `<Definition with the spec.>`
+
+  `<Theorem referring to the spec.>`
+
+  `end Sp1`
+-/
 def fileOfLemma (lem spec : String) : String :=
   s!"{imports} \nnamespace {namespc} \n\n{spec}\n\n{lem}\n\nend {namespc}"
   where namespc := "Sp1"
         imports := "import Sp1Poc"
 
+/--
+  Plumbing.
+-/
 def runTemplater {m : Type → Type v} [Monad m] (templater : StateM Nat (String × String)) : m (String × String) :=
   pure (templater.run' 0)
 

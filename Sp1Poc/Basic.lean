@@ -19,9 +19,6 @@ instance : NoZeroDivisors BabyBear := by
   simp [ZMod] at this
   infer_instance
 
-syntax "SPEC" : term
-macro_rules | `(SPEC) => `(True)
-
 syntax "PROOF" : term
 macro_rules | `(PROOF) => `(sorry)
 

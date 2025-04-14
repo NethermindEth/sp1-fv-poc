@@ -25,6 +25,9 @@ section
 
 open Cli
 
+/--
+  This is the top level function that implements what is described in `genTemplate -h`.
+-/
 unsafe def run (p : Parsed) : IO UInt32 := do
   let genRoot := GeneratedFolderRoot / (p.positionalArg! "circuit-name" |>.as! String)
   let file := genRoot / "main" |>.addExtension "lean"
@@ -45,7 +48,7 @@ unsafe def run (p : Parsed) : IO UInt32 := do
                                   pure <| path.as! String
     | _        , _          => IO.eprintln "Unreachable, `path` must be .some."; return 1
 
-  -- 
+  
   let lem ← runTemplater ∘
             Function.uncurry defsOfConstraints =<<
             liftM ∘ translateConstraints =<<
@@ -56,8 +59,7 @@ unsafe def run (p : Parsed) : IO UInt32 := do
 
   where cloneRust (to : System.FilePath) (url : String) : IO Unit :=
           discard (cloneWithCache s!"{to}" url).toBaseIO
-  
-open Cli in
+
 unsafe def cli : Cmd := `[Cli|
   genTemplate VIA run; ["1.0.0"]
   "Lean synthesizer dependent on the associated rust extractor. Assumed to be in `./RustExtractor` unless specified otherwise."
