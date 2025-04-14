@@ -11,6 +11,7 @@ private def v4_17_0 := "e7fd1a415c80985ade02a021172834ca2139b0ca"
 require Cli from git "https://github.com/leanprover/lean4-cli"@v4_17_0
 
 lean_lib Sp1Poc
+lean_lib Generated
 
 @[default_target]
 lean_exe genTemplate where

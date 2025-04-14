@@ -29,7 +29,8 @@ open Cli
   This is the top level function that implements what is described in `genTemplate -h`.
 -/
 unsafe def run (p : Parsed) : IO UInt32 := do
-  let genRoot := GeneratedFolderRoot / (p.positionalArg! "circuit-name" |>.as! String)
+  let circuit := p.positionalArg! "circuit-name" |>.as! String
+  let genRoot := GeneratedFolderRoot / circuit
   let file := genRoot / "main" |>.addExtension "lean"
 
   if (←System.FilePath.pathExists file) && !p.hasFlag "force"
@@ -49,6 +50,8 @@ unsafe def run (p : Parsed) : IO UInt32 := do
             rustOutput s!"{path}"
 
   IO.FS.writeFile file (Function.uncurry fileOfLemma lem)
+  IO.FS.withFile "Generated.lean" .append (·.write s!"import Generated.{circuit}.main".toUTF8)
+  
   return 0
 
   where cloneRust (to : System.FilePath) (url : String) : IO Unit :=
@@ -56,7 +59,7 @@ unsafe def run (p : Parsed) : IO UInt32 := do
 
 unsafe def cli : Cmd := `[Cli|
   genTemplate VIA run; ["1.0.0"]
-  "Lean synthesizer dependent on the associated rust extractor. Assumed to be in `./RustExtractor` unless specified otherwise."
+  "Lean synthesizer dependent on the associated rust extractor. Assumed to be in `./RustExtractor` unless specified otherwise. POC Note: you can use `lake build Generated` to separately build (proof check) all Lean circuits."
 
   FLAGS:
     f, force     ; "Force overwrite the existing circuit."
