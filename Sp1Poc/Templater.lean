@@ -44,19 +44,24 @@ private def translateConstraint (c : TSyntax `constraint) : Except String (Strin
     isTrue := match multiplicity.raw.isNatLit? with
       | none => true
       | some x => x ∈ [0, 1, BabyBearPrime - 1]
-    if !isTrue then throw "Unsupported multiplicity."
-    let .some interactionKind := terms.getElems[0]? | throw "Unsupported lookup: no interaction kind."
+    if !isTrue then throw s!"Unsupported multiplicity: {strOfTerm multiplicity}"
+    let .some interactionKind := terms.getElems[0]? | throw "Lookup without interaction kind."
     match interactionKind.raw.isNatLit? with
-    | .some 5 => let ⟨[_, opcode, a, _, b, c]⟩ := terms.getElems.map TSyntax.raw | throw "Unsupported lookup: Byte operations require 6 parameters."
-                 let term :=
-                  s!"match {opcode.toNat} with
-         | 4 => if {multiplicity.raw} = 1
-                then {strOfIdent b} < 256 ∧ {strOfIdent c} < 256
-                else if {multiplicity.raw} = 0 || {multiplicity.raw} = BabyBearPrime - 1
-                     then True else sorry
-         | _ => sorry"
+    | .some 3 => if terms.elemsAndSeps.size ≠ 39 then throw "Instruction-related lookup does not have 20 parameters."
+                 else let term := s!"if {strOfTerm multiplicity} = 0 || {strOfTerm multiplicity} = BabyBearPrime - 1 then True else sorry"
+                      return (term, all_vars)
+    | .some 5 => if terms.elemsAndSeps.size ≠ 11 then throw "Byte-related lookup does not have 6 parameters."
+                 let ⟨[_, opcode, a, _, b, c]⟩ := terms.getElems | throw "Byte-related lookup does not have 6 parameters."
+                 let term := s!"if {strOfTerm multiplicity} = 0 then True else
+         if {strOfTerm multiplicity} = 1 then
+         match {strOfTerm opcode} with
+         | 4 => if {strOfTerm multiplicity} = 1
+                then {strOfTerm b} < 256 ∧ {strOfTerm c} < 256
+                else if {strOfTerm multiplicity} = 0 then True else sorry
+         | _ => sorry
+         else sorry"
                  return (term, all_vars)
-    | _ => throw "Unsupported lookup: unsupported interaction kind."
+    | _ => throw s!"Unsupported lookup interaction kind: {strOfTerm interactionKind}"
 
   -- "Permutation(" ("FirstRow(" <|> "TransitionRow(" <|> "LastRow(") term:min ")" ")"
   | `(constraint| Permutation(FirstRow($_))     )
@@ -76,7 +81,7 @@ private def translateConstraint (c : TSyntax `constraint) : Except String (Strin
           return res
 
         rejectUnsupportedLookupVars (bvs : Array String) : Except String Unit :=
-          if bvs.all (·.startsWith "ML") then return () else throw "Unsupported lookup variable."
+          if bvs.all (·.startsWith "ML") then return () else throw "Unsupported lookup variables."
 
 section
 
@@ -102,9 +107,11 @@ def translateConstraints (input : String) : EIO String (Array String × Array St
     let mut hypotheses := #[]
     for constraint in constraints do
       if let .ok stx := Parser.runParserCategory (←getEnv) `constraint constraint then
-      if let .ok (term, bvs) := translateConstraint ⟨stx⟩ then
-      bvars      := bvars.append bvs
-      hypotheses := hypotheses.push term
+      match translateConstraint ⟨stx⟩ with
+      | .ok (term, bvs) =>
+        bvars      := bvars.append bvs
+        hypotheses := hypotheses.push term
+      | .error err_msg => panic err_msg
     pure (bvars, hypotheses)
 
 end Elaborator

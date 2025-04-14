@@ -48,7 +48,7 @@ unsafe def cli : Cmd := `[Cli|
 
   ARGS:
     "path-to-constraints" : String; "Path to the file containing circut constraints."
-    "circuit-name" : String; "Circuit name."
+    "output-circuit-name" : String; "Circuit name."
 ]
 
 end
