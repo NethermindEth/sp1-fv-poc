@@ -2,6 +2,7 @@ import Sp1Poc.Wheels
 import Lean
 import Mathlib.Lean.CoreM
 import Std.Data.HashSet.Basic
+import Sp1Poc.Basic
 
 namespace Sp1
 
@@ -36,20 +37,35 @@ section Elaborator
 private def translateConstraint (c : TSyntax `constraint) : Except String (String × Array String) :=
   match c with
   -- "Lookup(" term "," "[" term,* "]" ")"
-  | `(constraint| Lookup($selector:term, [$terms:term,*])) => do
-    let some 1 := selector.raw.isNatLit? | throw "Unsupported Lookup format - selector."
-    let ⟨[a, b, c, d, e, f]⟩ := terms.getElems.map TSyntax.raw | throw "Unsupported Lookup format - expected 6 elements."
-    match a.isNatLit?, b.isNatLit?, c.isNatLit?, c.isNatLit?, e.isIdent, f.isIdent with
-    | some 5, some 4, some 0, some 0, true, true =>
-      /-
-        POC note.
+  | `(constraint| Lookup($multiplicity:term, [$terms:term,*])) => do
+    rejectUnsupportedLookupVars (terms.getElems.foldl (·++bvsOfStx ·) #[])
+    let mut isTrue : Bool := true
+    isTrue := match multiplicity.raw.isNatLit? with
+      | none => true
+      | some x => x ∈ [0, 1, BabyBearPrime - 1]
+    if !isTrue then throw "Unsupported multiplicity."
+    let .some interactionKind := terms.getElems[0]? | throw "Unsupported lookup: no interaction kind."
+    match interactionKind.raw.isNatLit? with
+    | .some 5 => let .some x := terms.getElems[1]? | throw "..."
+                 let .some e := terms.getElems[4]? | throw "..."
+                --  let .some f := terms.getElems[4]? | throw "..."
+                 let term := s!"match {x} with | 4 => {strOfIdent e.raw} < 256 ∧ {strOfIdent f} < 256 | _ => sorry"
+                 return (term, #[])
+    | _ => throw "Unsupported lookup: unsupported interaction kind."
+
+    -- let ⟨[a, b, c, d, e, f]⟩ := terms.getElems.map TSyntax.raw | throw "Unsupported Lookup format - expected 6 elements."
+    -- Lookup(0 | 1 | BabyBearPrime - 1, [elems...])
+    -- match a.isNatLit?, b.isNatLit?, c.isNatLit?, c.isNatLit?, e.isIdent, f.isIdent with
+    -- | some 5, some 4, some 0, some 0, true, true =>
+    --   /-
+    --     POC note.
         
-        One can extend this trivially with an extra `if` to check for `= -1`.
-      -/
-      let constraint := s!"if {strOfTerm selector} = 1 then ({strOfIdent e} < 256 ∧ {strOfIdent f} < 256) else True"
-      pure (constraint, #[strOfIdent e, strOfIdent f])
-    | _     , _     , _     , _     , _   , _    =>
-      throw s!"Unsupported Lookup format - [{a}, {b}, {c}, {d}, {e}, {f}]."
+    --     One can extend this trivially with an extra `if` to check for `= -1`.
+    --   -/
+    --   let constraint := s!"if {strOfTerm selector} = 1 then ({strOfIdent e} < 256 ∧ {strOfIdent f} < 256) else True"
+    --   pure (constraint, #[strOfIdent e, strOfIdent f])
+    -- | _     , _     , _     , _     , _   , _    =>
+    --   throw s!"Unsupported Lookup format - [{a}, {b}, {c}, {d}, {e}, {f}]."
 
   -- "Permutation(" ("FirstRow(" <|> "TransitionRow(" <|> "LastRow(") term:min ")" ")"
   | `(constraint| Permutation(FirstRow($_))     ) 
@@ -57,14 +73,19 @@ private def translateConstraint (c : TSyntax `constraint) : Except String (Strin
   | `(constraint| Permutation(LastRow($_))      ) => pure ("True", #[])
 
   -- "Constraint(" term:min ")"
-  | `(constraint| Constraint($t:term)) => do
-    let mut res : Array String := #[]
-    for node in t.raw.topDown do
-      if node.isIdent then res := res.push (strOfIdent node)
-    pure (strOfTerm t, res)
+  | `(constraint| Constraint($t:term)) =>
+    pure (strOfTerm t, bvsOfStx t)
   | stx => throw s!"Unrecognised constraint syntax: {stx}."
-  where strOfTerm  (t : Term)   : String := t.raw.prettyPrint.pretty
-        strOfIdent (i : Syntax) : String := i.getId.toString
+  where strOfTerm  (t : Term)     : String       := t.raw.prettyPrint.pretty
+        strOfIdent (stx : Syntax) : String       := stx.getId.toString
+        bvsOfStx   (stx : Syntax) : Array String := Id.run do
+          let mut res : Array String := #[]
+          for node in stx.topDown do
+            if node.isIdent then res := res.push (strOfIdent node)
+          return res
+
+        rejectUnsupportedLookupVars (bvs : Array String) : Except String Unit :=
+          if bvs.all (·.startsWith "ML") then return () else throw "Unsupported lookup variable."
 
 section
 
