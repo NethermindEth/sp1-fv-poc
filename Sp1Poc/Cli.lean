@@ -40,19 +40,13 @@ unsafe def run (p : Parsed) : IO UInt32 := do
 
   unless ←System.FilePath.pathExists genRoot do IO.FS.createDirAll genRoot
 
-  let rustPath ←
-    match p.flag? "url", p.flag? "path" with
-    | .none    , .none      => pure (f := IO) RustFolderRoot
-    | .none    , .some path => pure <| path.as! String
-    | .some url, .some path => do cloneRust path.value url.value
-                                  pure <| path.as! String
-    | _        , _          => IO.eprintln "Unreachable, `path` must be .some."; return 1
-
+  let path := p.flag! "path" |>.as! String
+  if let .some url := p.flag? "url" then cloneRust path url.value
   
   let lem ← runTemplater ∘
             Function.uncurry defsOfConstraints =<<
             liftM ∘ translateConstraints =<<
-            rustOutput s!"{rustPath}"
+            rustOutput s!"{path}"
 
   IO.FS.writeFile file (Function.uncurry fileOfLemma lem)
   return 0
