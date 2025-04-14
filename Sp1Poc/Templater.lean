@@ -21,7 +21,7 @@ end Syntax
 section Elaborator
 
 /--
-  Note the syntax is parsed implicitly, as we are 'invoking' Lean's parser via description 
+  Note the syntax is parsed implicitly, as we are 'invoking' Lean's parser via description
   in the `section Syntax`. Thus, we allow a broad range of expressions.
 
   `translateConstraint` then post-processes this information and rejects currently unsupported
@@ -38,7 +38,8 @@ private def translateConstraint (c : TSyntax `constraint) : Except String (Strin
   match c with
   -- "Lookup(" term "," "[" term,* "]" ")"
   | `(constraint| Lookup($multiplicity:term, [$terms:term,*])) => do
-    rejectUnsupportedLookupVars (terms.getElems.foldl (·++bvsOfStx ·) #[])
+    let all_vars := terms.getElems.foldl (·++bvsOfStx ·) #[]
+    rejectUnsupportedLookupVars all_vars
     let mut isTrue : Bool := true
     isTrue := match multiplicity.raw.isNatLit? with
       | none => true
@@ -46,29 +47,19 @@ private def translateConstraint (c : TSyntax `constraint) : Except String (Strin
     if !isTrue then throw "Unsupported multiplicity."
     let .some interactionKind := terms.getElems[0]? | throw "Unsupported lookup: no interaction kind."
     match interactionKind.raw.isNatLit? with
-    | .some 5 => let .some x := terms.getElems[1]? | throw "..."
-                 let .some e := terms.getElems[4]? | throw "..."
-                --  let .some f := terms.getElems[4]? | throw "..."
-                 let term := s!"match {x} with | 4 => {strOfIdent e.raw} < 256 ∧ {strOfIdent f} < 256 | _ => sorry"
-                 return (term, #[])
+    | .some 5 => let ⟨[_, opcode, a, _, b, c]⟩ := terms.getElems.map TSyntax.raw | throw "Unsupported lookup: Byte operations require 6 parameters."
+                 let term :=
+                  s!"match {opcode.toNat} with
+         | 4 => if {multiplicity.raw} = 1
+                then {strOfIdent b} < 256 ∧ {strOfIdent c} < 256
+                else if {multiplicity.raw} = 0 || {multiplicity.raw} = BabyBearPrime - 1
+                     then True else sorry
+         | _ => sorry"
+                 return (term, all_vars)
     | _ => throw "Unsupported lookup: unsupported interaction kind."
 
-    -- let ⟨[a, b, c, d, e, f]⟩ := terms.getElems.map TSyntax.raw | throw "Unsupported Lookup format - expected 6 elements."
-    -- Lookup(0 | 1 | BabyBearPrime - 1, [elems...])
-    -- match a.isNatLit?, b.isNatLit?, c.isNatLit?, c.isNatLit?, e.isIdent, f.isIdent with
-    -- | some 5, some 4, some 0, some 0, true, true =>
-    --   /-
-    --     POC note.
-        
-    --     One can extend this trivially with an extra `if` to check for `= -1`.
-    --   -/
-    --   let constraint := s!"if {strOfTerm selector} = 1 then ({strOfIdent e} < 256 ∧ {strOfIdent f} < 256) else True"
-    --   pure (constraint, #[strOfIdent e, strOfIdent f])
-    -- | _     , _     , _     , _     , _   , _    =>
-    --   throw s!"Unsupported Lookup format - [{a}, {b}, {c}, {d}, {e}, {f}]."
-
   -- "Permutation(" ("FirstRow(" <|> "TransitionRow(" <|> "LastRow(") term:min ")" ")"
-  | `(constraint| Permutation(FirstRow($_))     ) 
+  | `(constraint| Permutation(FirstRow($_))     )
   | `(constraint| Permutation(TransitionRow($_)))
   | `(constraint| Permutation(LastRow($_))      ) => pure ("True", #[])
 
@@ -112,7 +103,7 @@ def translateConstraints (input : String) : EIO String (Array String × Array St
     for constraint in constraints do
       if let .ok stx := Parser.runParserCategory (←getEnv) `constraint constraint then
       if let .ok (term, bvs) := translateConstraint ⟨stx⟩ then
-      bvars      := bvars.append bvs 
+      bvars      := bvars.append bvs
       hypotheses := hypotheses.push term
     pure (bvars, hypotheses)
 
