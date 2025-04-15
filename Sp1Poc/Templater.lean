@@ -54,10 +54,10 @@ private def translateConstraint (c : TSyntax `constraint) : Except String (Strin
               let term := strOfByteLookup multiplicity opcode b c
               return (term, all_vars)
       -- 5 parameters: 7: MSB
-      | 9 => let ⟨[_, _, _, _, _]⟩ := terms.getElems | throw "Impossible."
+      | 9 => rejectImpossibleLength terms 5
              throw s!"Unsupported lookup: MSB"
       -- 3 parameters: U16Range
-      | 5 => let ⟨[_, _, _]⟩ := terms.getElems | throw "Impossible."
+      | 5 => rejectImpossibleLength terms 3
              throw s!"Unsupported lookup: U16Range"
       -- Incorrect number of parameters
       | _ => throw s!"Incorrect number of parameters provided to Byte-related lookup"
@@ -80,8 +80,12 @@ private def translateConstraint (c : TSyntax `constraint) : Except String (Strin
             if node.isIdent then res := res.push (strOfIdent node)
           return res
 
-        rejectUnsupportedLookupVars (bvs : Array String) : Except String Unit :=
-          if bvs.all (·.startsWith "ML") then return () else throw "Unsupported lookup variables."
+        guardWith (c : Bool) (ε : String) : Except String Unit :=
+          if c then return () else throw ε
+        rejectUnsupportedLookupVars (bvs : Array String) :=
+          guardWith (bvs.all (·.startsWith "ML")) "Unsupported lookup variables."
+        rejectImpossibleLength {α} {s} (lookupArgs : Syntax.TSepArray α s) (expected : ℕ) :=
+          guardWith (lookupArgs.getElems.size == expected) "Impossible"
 
         newLineOrEmpty (newLine : Bool) : String := if newLine then "\n" else ""
         indent (n : ℕ) : String := String.replicate n ' '
