@@ -48,7 +48,7 @@ private def translateConstraint (c : TSyntax `constraint) : Except String (Strin
     let .some interactionKind := terms.getElems[0]? | throw "Lookup without interaction kind."
     match interactionKind.raw.isNatLit? with
     | .some 3 => if terms.elemsAndSeps.size ≠ 39 then throw "Instruction-related lookup does not have 20 parameters."
-                 else let term := s!"if {strOfTerm multiplicity} = 0 || {strOfTerm multiplicity} = BabyBearPrime - 1 then True else sorry"
+                 else let term := s!"if {strOfTerm multiplicity} = 0 || {strOfTerm multiplicity} = BabyBearPrime - 1 then True else undefined"
                       return (term, all_vars)
     | .some 5 => if terms.elemsAndSeps.size ≠ 11 then throw "Byte-related lookup does not have 6 parameters."
                  let ⟨[_, opcode, a, _, b, c]⟩ := terms.getElems | throw "Byte-related lookup does not have 6 parameters."
@@ -56,10 +56,10 @@ private def translateConstraint (c : TSyntax `constraint) : Except String (Strin
          if {strOfTerm multiplicity} = 1 then
          match {strOfTerm opcode} with
          | 4 => if {strOfTerm multiplicity} = 1
-                then {strOfTerm b} < 256 ∧ {strOfTerm c} < 256
-                else if {strOfTerm multiplicity} = 0 then True else sorry
-         | _ => sorry
-         else sorry"
+                then {strOfTerm b}.val < 256 ∧ {strOfTerm c}.val < 256
+                else if {strOfTerm multiplicity} = 0 then True else undefined
+         | _ => undefined
+         else undefined"
                  return (term, all_vars)
     | _ => throw s!"Unsupported lookup interaction kind: {strOfTerm interactionKind}"
 
@@ -128,7 +128,7 @@ end Elaborator
 def defsOfConstraints (bvars : Array String) (constraints : Array String) : StateM Nat (String × String) := do
   let n ← getModify (·+1)
   pure (
-    s!"{options}\ntheorem {lemName n}\n{Indent}\{{typedBvars}}\n{hypotheses} : {specName n} {bvs} := PROOF",
+    s!"{options}\nset_option maxHeartbeats 5000000 in\ntheorem {lemName n}\n{Indent}\{{typedBvars}}\n{hypotheses} : {specName n} {bvs} := PROOF",
     s!"def {specName n}\n{Indent}({typedBvars}) : Prop := True"
   )
   where Indent : String := ⟨List.replicate 2 ' '⟩

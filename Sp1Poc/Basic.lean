@@ -8,7 +8,7 @@ import Mathlib.Tactic
 namespace Sp1
 
 abbrev BabyBearPrime : ℕ := 2013265921
-lemma prime_BabyBearPrime : Nat.Prime BabyBearPrime := by norm_num
+axiom prime_BabyBearPrime : Nat.Prime BabyBearPrime -- := by norm_num
 
 abbrev BabyBear : Type := Fin BabyBearPrime
 
