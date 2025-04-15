@@ -1,15 +1,11 @@
-import Sp1Poc
-namespace Sp1
+import Sp1Poc.Specs
 
-def spec_addition (A1 A2 A3 A4 B1 B2 B3 B4 C1 C2 C3 C4 : BabyBear) : Prop :=
-  ( ( B1.val + 256 * B2.val + 65536 * B3.val + 16777216 * B4.val ) +
-    ( C1.val + 256 * C2.val + 65536 * C3.val + 16777216 * C4.val ) ) % 4294967296 =
-  ( A1.val + 256 * A2.val + 65536 * A3.val + 16777216 * A4.val )
+namespace Sp1
 
 def spec_ML16_1
   (ML0 ML1 ML2 ML3 ML4 ML5 ML6 ML7 ML8 ML9 ML10 ML11 ML12 ML13 ML14 ML15 ML16 ML17 ML18 : BabyBear) : Prop :=
   (ML16 = 1) →
-    spec_addition ML1 ML2 ML3 ML4 ML8 ML9 ML10 ML11 ML12 ML13 ML14 ML15
+    spec_32_bit_wrap_add ML1 ML2 ML3 ML4 ML8 ML9 ML10 ML11 ML12 ML13 ML14 ML15
 
 set_option maxHeartbeats 1000000 in
 theorem conformance_ML16_1
@@ -91,7 +87,7 @@ theorem conformance_ML16_1
   (C26 : (ML16 * (ML7 * (ML7 - 1))) = 0)
   (C27 : (ML16 * (ML16 * (ML16 - 1))) = 0)
   (C28 : (ML16 * ((ML17 + ML18) - 1)) = 0) : spec_ML16_1 ML0 ML1 ML2 ML3 ML4 ML5 ML6 ML7 ML8 ML9 ML10 ML11 ML12 ML13 ML14 ML15 ML16 ML17 ML18 := by
-    unfold spec_ML16_1; intro HML16; unfold spec_addition
+    unfold spec_ML16_1; intro HML16; unfold spec_32_bit_wrap_add
     subst_eqs; simp [sub_eq_zero (b := (1 : BabyBear))] at *
     rcases C24 <;> rcases C25 <;> rcases C26 <;> subst_eqs <;>
     simp [BabyBearPrime, Fin.add_def, Fin.sub_def] at * <;>

@@ -35,7 +35,7 @@ unsafe def run (p : Parsed) : IO UInt32 := do
             IO.FS.readFile path_to_constraints
 
   IO.FS.writeFile file (Function.uncurry fileOfLemma lem)
-  IO.FS.withFile "Generated.lean" .append (·.write s!"import Generated.{circuit}.main".toUTF8)
+  IO.FS.withFile "Generated.lean" .append (·.write s!"import Generated.{circuit}.main\n".toUTF8)
 
   return 0
 

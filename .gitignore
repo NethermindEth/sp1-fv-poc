@@ -1,3 +1,4 @@
 /.lake
 /RustExtractor
 /Generated/*
+Generated.lean

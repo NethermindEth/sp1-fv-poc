@@ -180,7 +180,7 @@ def defsOfConstraints (bvars : Array String) (constraints : Array String) : Stat
 def fileOfLemma (lem spec : String) : String :=
   s!"{imports} \nnamespace {namespc} \n\n{spec}\n\n{lem}\n\nend {namespc}"
   where namespc := "Sp1"
-        imports := "import Sp1Poc"
+        imports := "import Sp1Poc.Specs"
 
 /--
   Plumbing.
