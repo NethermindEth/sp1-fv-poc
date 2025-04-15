@@ -43,13 +43,24 @@ private def translateConstraint (c : TSyntax `constraint) : Except String (Strin
     if !multiplicity.raw.isNatLit?.elim true (· ∈ [0, 1, BabyBearPrime - 1]) then throw s!"Unsupported multiplicity: {strOfTerm multiplicity}"
     let .some interactionKind := terms.getElems[0]? | throw "Lookup without interaction kind."
     match interactionKind.raw.isNatLit? with
-    | .some 3 => if terms.elemsAndSeps.size ≠ 39 then throw "Instruction-related lookup does not have 20 parameters."
-                 else let term := s!"if {strOfTerm multiplicity} = 0 || {strOfTerm multiplicity} = BabyBearPrime - 1 then True else undefined"
-                      return (term, all_vars)
-    | .some 5 => if terms.elemsAndSeps.size ≠ 11 then throw "Byte-related lookup does not have 6 parameters."
-                 let ⟨[_, opcode, _, _, b, c]⟩ := terms.getElems | throw "Byte-related lookup does not have 6 parameters."
-                 let term := strOfLookup multiplicity opcode b c
-                 return (term, all_vars)
+    | .some 3 =>
+      if terms.elemsAndSeps.size ≠ 39 then throw "Instruction-related lookup does not have 20 parameters."
+      else let term := s!"if {strOfTerm multiplicity} = 0 || {strOfTerm multiplicity} = BabyBearPrime - 1 then True else undefined"
+           return (term, all_vars)
+    | .some 5 =>
+      match terms.elemsAndSeps.size with
+      -- 0-6: AND, OR, XOR, SLL, U8Range, ShrCarry, LTU
+      | 11 => let ⟨[_, opcode, _, _, b, c]⟩ := terms.getElems | throw "Byte-related lookup does not have 6 parameters."
+              let term := strOfByteLookup multiplicity opcode b c
+              return (term, all_vars)
+      -- 7: MSB
+      | 9 => let ⟨[_, _, _, _, _]⟩ := terms.getElems | throw "Impossible."
+             throw s!"Unsupported lookup: MSB"
+      -- 8: U16Range
+      | 5 => let ⟨[_, _, b]⟩ := terms.getElems | throw "Impossible."
+             throw s!"Unsupported lookup: U16Range"
+      -- Incorrect number of parameters
+      | _ => throw s!"Incorrect number of parameters provided to Byte-related lookup"
     | _ => throw s!"Unsupported lookup interaction kind: {strOfTerm interactionKind}"
 
   -- "Permutation(" ("FirstRow(" <|> "TransitionRow(" <|> "LastRow(") term:min ")" ")"
@@ -72,15 +83,22 @@ private def translateConstraint (c : TSyntax `constraint) : Except String (Strin
         rejectUnsupportedLookupVars (bvs : Array String) : Except String Unit :=
           if bvs.all (·.startsWith "ML") then return () else throw "Unsupported lookup variables."
 
-        strOfLookup (multiplicity opcode b c : Term) : String :=
-      s!"if {strOfTerm multiplicity} = 0 then True else
-         if {strOfTerm multiplicity} = 1 then
-         match {strOfTerm opcode} with
-         | 4 => if {strOfTerm multiplicity} = 1
-                then {strOfTerm b}.val < 256 ∧ {strOfTerm c}.val < 256
-                else if {strOfTerm multiplicity} = 0 then True else undefined
+        newLineOrEmpty (newLine : Bool) : String := if newLine then "\n" else ""
+        indent (n : ℕ) : String := String.replicate n ' '
+
+        strOfU8Range (multiplicity b c : Term) (newLine : Bool) (indentation : ℕ) : String :=
+      s!"{newLineOrEmpty newLine}{if newLine then indent indentation else ""}if {strOfTerm multiplicity} = 1
+{indent (indentation + 2)}then {strOfTerm b}.val < 256 ∧ {strOfTerm c}.val < 256
+{indent (indentation + 2)}else if {strOfTerm multiplicity} = 0 then True else undefined"
+
+        strOfByteLookup (multiplicity opcode b c : Term) : String :=
+      s!"
+    if {strOfTerm multiplicity} = 0 then True else
+    if {strOfTerm multiplicity} = 1
+    then match {strOfTerm opcode} with
+         | 4 => {strOfU8Range multiplicity b c false 14}
          | _ => undefined
-         else undefined"
+    else undefined"
 
 section
 

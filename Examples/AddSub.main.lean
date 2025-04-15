@@ -1,64 +1,73 @@
 import Sp1Poc
 namespace Sp1
 
+def spec_addition (A1 A2 A3 A4 B1 B2 B3 B4 C1 C2 C3 C4 : BabyBear) : Prop :=
+  ( ( B1.val + 256 * B2.val + 65536 * B3.val + 16777216 * B4.val ) +
+    ( C1.val + 256 * C2.val + 65536 * C3.val + 16777216 * C4.val ) ) % 4294967296 =
+  ( A1.val + 256 * A2.val + 65536 * A3.val + 16777216 * A4.val )
+
 def spec_ML16_1
   (ML0 ML1 ML2 ML3 ML4 ML5 ML6 ML7 ML8 ML9 ML10 ML11 ML12 ML13 ML14 ML15 ML16 ML17 ML18 : BabyBear) : Prop :=
   (ML16 = 1) →
-    ( ( ML8.val + 256 * ML9.val + 65536 * ML10.val + 16777216 * ML11.val ) +
-      ( ML12.val + 256 * ML13.val + 65536 * ML14.val + 16777216 * ML15.val ) ) % 4294967296 =
-    ( ML1.val + 256 * ML2.val + 65536 * ML3.val + 16777216 * ML4.val )
+    spec_addition ML1 ML2 ML3 ML4 ML8 ML9 ML10 ML11 ML12 ML13 ML14 ML15
 
 set_option maxHeartbeats 1000000 in
 theorem conformance_ML16_1
   {ML0 ML1 ML2 ML3 ML4 ML5 ML6 ML7 ML8 ML9 ML10 ML11 ML12 ML13 ML14 ML15 ML16 ML17 ML18 : BabyBear}
-  (C00 : if ML16 = 0 then True else
-         if ML16 = 1 then
-         match 4 with
+  (C00 :
+    if ML16 = 0 then True else
+    if ML16 = 1
+    then match 4 with
          | 4 => if ML16 = 1
                 then ML8.val < 256 ∧ ML9.val < 256
                 else if ML16 = 0 then True else undefined
          | _ => undefined
-         else undefined)
-  (C01 : if ML16 = 0 then True else
-         if ML16 = 1 then
-         match 4 with
+    else undefined)
+  (C01 :
+    if ML16 = 0 then True else
+    if ML16 = 1
+    then match 4 with
          | 4 => if ML16 = 1
                 then ML10.val < 256 ∧ ML11.val < 256
                 else if ML16 = 0 then True else undefined
          | _ => undefined
-         else undefined)
-  (C02 : if ML16 = 0 then True else
-         if ML16 = 1 then
-         match 4 with
+    else undefined)
+  (C02 :
+    if ML16 = 0 then True else
+    if ML16 = 1
+    then match 4 with
          | 4 => if ML16 = 1
                 then ML12.val < 256 ∧ ML13.val < 256
                 else if ML16 = 0 then True else undefined
          | _ => undefined
-         else undefined)
-  (C03 : if ML16 = 0 then True else
-         if ML16 = 1 then
-         match 4 with
+    else undefined)
+  (C03 :
+    if ML16 = 0 then True else
+    if ML16 = 1
+    then match 4 with
          | 4 => if ML16 = 1
                 then ML14.val < 256 ∧ ML15.val < 256
                 else if ML16 = 0 then True else undefined
          | _ => undefined
-         else undefined)
-  (C04 : if ML16 = 0 then True else
-         if ML16 = 1 then
-         match 4 with
+    else undefined)
+  (C04 :
+    if ML16 = 0 then True else
+    if ML16 = 1
+    then match 4 with
          | 4 => if ML16 = 1
                 then ML1.val < 256 ∧ ML2.val < 256
                 else if ML16 = 0 then True else undefined
          | _ => undefined
-         else undefined)
-  (C05 : if ML16 = 0 then True else
-         if ML16 = 1 then
-         match 4 with
+    else undefined)
+  (C05 :
+    if ML16 = 0 then True else
+    if ML16 = 1
+    then match 4 with
          | 4 => if ML16 = 1
                 then ML3.val < 256 ∧ ML4.val < 256
                 else if ML16 = 0 then True else undefined
          | _ => undefined
-         else undefined)
+    else undefined)
   (C06 : if (ML17 * 2013265920) = 0 || (ML17 * 2013265920) = BabyBearPrime - 1 then True else undefined)
   (C07 : if (ML18 * 2013265920) = 0 || (ML18 * 2013265920) = BabyBearPrime - 1 then True else undefined)
   (C08 : True)
@@ -82,7 +91,8 @@ theorem conformance_ML16_1
   (C26 : (ML16 * (ML7 * (ML7 - 1))) = 0)
   (C27 : (ML16 * (ML16 * (ML16 - 1))) = 0)
   (C28 : (ML16 * ((ML17 + ML18) - 1)) = 0) : spec_ML16_1 ML0 ML1 ML2 ML3 ML4 ML5 ML6 ML7 ML8 ML9 ML10 ML11 ML12 ML13 ML14 ML15 ML16 ML17 ML18 := by
-    unfold spec_ML16_1; intro HML16; subst_eqs; simp [sub_eq_zero (b := (1 : BabyBear))] at *
+    unfold spec_ML16_1; intro HML16; unfold spec_addition
+    subst_eqs; simp [sub_eq_zero (b := (1 : BabyBear))] at *
     rcases C24 <;> rcases C25 <;> rcases C26 <;> subst_eqs <;>
     simp [BabyBearPrime, Fin.add_def, Fin.sub_def] at * <;>
     omega
