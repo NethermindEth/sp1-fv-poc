@@ -49,14 +49,14 @@ private def translateConstraint (c : TSyntax `constraint) : Except String (Strin
            return (term, all_vars)
     | .some 5 =>
       match terms.elemsAndSeps.size with
-      -- 0-6: AND, OR, XOR, SLL, U8Range, ShrCarry, LTU
+      -- 6 parameters: 0-6: AND, OR, XOR, SLL, U8Range, ShrCarry, LTU
       | 11 => let ⟨[_, opcode, _, _, b, c]⟩ := terms.getElems | throw "Byte-related lookup does not have 6 parameters."
               let term := strOfByteLookup multiplicity opcode b c
               return (term, all_vars)
-      -- 7: MSB
+      -- 5 parameters: 7: MSB
       | 9 => let ⟨[_, _, _, _, _]⟩ := terms.getElems | throw "Impossible."
              throw s!"Unsupported lookup: MSB"
-      -- 8: U16Range
+      -- 3 parameters: U16Range
       | 5 => let ⟨[_, _, b]⟩ := terms.getElems | throw "Impossible."
              throw s!"Unsupported lookup: U16Range"
       -- Incorrect number of parameters
