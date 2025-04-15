@@ -57,7 +57,7 @@ private def translateConstraint (c : TSyntax `constraint) : Except String (Strin
       | 9 => let ⟨[_, _, _, _, _]⟩ := terms.getElems | throw "Impossible."
              throw s!"Unsupported lookup: MSB"
       -- 3 parameters: U16Range
-      | 5 => let ⟨[_, _, b]⟩ := terms.getElems | throw "Impossible."
+      | 5 => let ⟨[_, _, _]⟩ := terms.getElems | throw "Impossible."
              throw s!"Unsupported lookup: U16Range"
       -- Incorrect number of parameters
       | _ => throw s!"Incorrect number of parameters provided to Byte-related lookup"
