@@ -1,4 +1,4 @@
-import Sp1Poc
+import Sp1Poc.Cli
 import Lake
 import Lean
 
