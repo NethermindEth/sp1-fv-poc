@@ -189,7 +189,7 @@ theorem conformance_ML38_ML13
     constructor; exact C32
     constructor; exact C33
     constructor; exact C34
-    simp [BabyBearPrime, Fin.add_def, Fin.sub_def, Fin.mul_def]
+    simp [BabyBearPrime, Fin.add_def, Fin.sub_def, Fin.mul_def] at *
     rw [@Nat.mod_eq_of_lt (ML14.val * _) 2013265921,
         @Nat.mod_eq_of_lt (ML15.val * _) 2013265921,
         @Nat.mod_eq_of_lt (ML16.val * _) 2013265921,
@@ -206,8 +206,6 @@ theorem conformance_ML38_ML13
     have H_ub_6_11 : ML6.val * ML11.val ≤ 65025 := by nlinarith
     have H_ub_5_12 : ML5.val * ML12.val ≤ 65025 := by nlinarith
 
-    simp [BabyBearPrime, Fin.add_def, Fin.sub_def, Fin.mul_def] at *
-
     have H_14_lb: ML14.val * 256 ≤ ML5.val * ML9.val := by omega
     have H_14_ub: ML5.val * ML9.val < (ML14.val + 1) * 256 := by omega
     have H_15_lb: ML15.val * 256 ≤ (ML5.val * ML10.val) + (ML6.val * ML9.val) + ML14.val := by omega
@@ -217,8 +215,6 @@ theorem conformance_ML38_ML13
     have H_17_lb: ML17.val * 256 ≤ ((((↑ML5 * ↑ML12) + (↑ML6 * ↑ML11)) + (↑ML7 * ↑ML10)) + (↑ML8 * ↑ML9)) + ↑ML16 := by omega
     have H_17_ub: ((((↑ML5 * ↑ML12) + (↑ML6 * ↑ML11)) + (↑ML7 * ↑ML10)) + (↑ML8 * ↑ML9)) + ↑ML16 < (ML17.val + 1) * 256 := by omega
 
-    ring_nf
-    rw [Nat.mod_def]
-    omega
+    ring_nf; omega
 
 end Sp1
