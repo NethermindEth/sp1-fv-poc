@@ -176,19 +176,18 @@ theorem conformance_ML38_ML13
     rcases C11 with ⟨ C17, C18 ⟩
     rcases C12 with ⟨ C19, C20 ⟩
     rcases C13 with ⟨ C21, C22 ⟩
-    rcases C14 with ⟨ C23, C24, C25, C26, C27, C28, C29, C30, C31, C32, C33, C34 ⟩
-    constructor; exact C23
-    constructor; exact C24
-    constructor; exact C25
-    constructor; exact C26
-    constructor; exact C27
-    constructor; exact C28
-    constructor; exact C29
-    constructor; exact C30
-    constructor; exact C31
-    constructor; exact C32
-    constructor; exact C33
-    constructor; exact C34
+    constructor; aesop
+    constructor; aesop
+    constructor; aesop
+    constructor; aesop
+    constructor; aesop
+    constructor; aesop
+    constructor; aesop
+    constructor; aesop
+    constructor; aesop
+    constructor; aesop
+    constructor; aesop
+    constructor; aesop
     simp [BabyBearPrime, Fin.add_def, Fin.sub_def, Fin.mul_def] at *
     rw [@Nat.mod_eq_of_lt (ML14.val * _) 2013265921,
         @Nat.mod_eq_of_lt (ML15.val * _) 2013265921,
