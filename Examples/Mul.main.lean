@@ -166,9 +166,9 @@ theorem conformance_MUL
     unfold spec_ML38_1_MUL; intros HML38 H_is_real H_op_a_not_0; unfold spec_32_bit_wrap_mul
     subst_eqs; simp_arith [sub_eq_zero (b := (1 : BabyBear))] at *
     have Hopcode: ML34 = 1 ∧ ML35 = 0 ∧ ML36 = 0 ∧ ML37 = 0 := by
-      rcases C40 <;> rcases C41 <;> rcases C42 <;> rcases C43 <;> subst_eqs <;> simp
+      rcases C40 <;> rcases C41 <;> rcases C42 <;> rcases C43 <;> subst_eqs; simp
     rcases Hopcode with ⟨ HML34, HML35, HML36, HML37 ⟩
-    subst_eqs <;> simp at * <;> subst_eqs <;> simp at *
+    subst_eqs; simp at *; subst_eqs; simp at *
     simp [sub_eq_zero] at C20 C21 C22 C23 C24 C25 C26 C27; subst_eqs
     simp [sub_eq_zero] at C28 C30 C32 C34; subst_eqs
     clear C15 C16 C17 C29 C31 C33 C35 C38 C39 C40 C41 C42 C43 C45 C46
@@ -183,16 +183,16 @@ theorem conformance_MUL
         @Nat.mod_eq_of_lt (ML16.val * _) 2013265921,
         @Nat.mod_eq_of_lt (ML17.val * _) 2013265921] <;> try omega
 
-    have H_ub_5_09 : ML5.val * ML9.val ≤ 65025 := by nlinarith
-    have H_ub_6_09 : ML6.val * ML9.val ≤ 65025 := by nlinarith
-    have H_ub_7_09 : ML7.val * ML9.val ≤ 65025 := by nlinarith
-    have H_ub_8_09 : ML8.val * ML9.val ≤ 65025 := by nlinarith
-    have H_ub_5_10 : ML5.val * ML10.val ≤ 65025 := by nlinarith
-    have H_ub_6_10 : ML6.val * ML10.val ≤ 65025 := by nlinarith
-    have H_ub_7_10 : ML7.val * ML10.val ≤ 65025 := by nlinarith
-    have H_ub_5_11 : ML5.val * ML11.val ≤ 65025 := by nlinarith
-    have H_ub_6_11 : ML6.val * ML11.val ≤ 65025 := by nlinarith
-    have H_ub_5_12 : ML5.val * ML12.val ≤ 65025 := by nlinarith
+    have H_ub_5_09 : ML5.val * ML9.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
+    have H_ub_6_09 : ML6.val * ML9.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
+    have H_ub_7_09 : ML7.val * ML9.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
+    have H_ub_8_09 : ML8.val * ML9.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
+    have H_ub_5_10 : ML5.val * ML10.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
+    have H_ub_6_10 : ML6.val * ML10.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
+    have H_ub_7_10 : ML7.val * ML10.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
+    have H_ub_5_11 : ML5.val * ML11.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
+    have H_ub_6_11 : ML6.val * ML11.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
+    have H_ub_5_12 : ML5.val * ML12.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
 
     have H_14_lb: ML14.val * 256 ≤ ML5.val * ML9.val := by omega
     have H_14_ub: ML5.val * ML9.val < (ML14.val + 1) * 256 := by omega
