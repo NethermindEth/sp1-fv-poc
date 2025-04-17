@@ -44,21 +44,36 @@ private def translateConstraint (c : TSyntax `constraint) : Except String (Strin
     let .some interactionKind := terms.getElems[0]? | throw "Lookup without interaction kind."
     match interactionKind.raw.isNatLit? with
     | .some 3 =>
-      if terms.elemsAndSeps.size ≠ 39 then throw "Instruction-related lookup does not have 20 parameters."
-      else let term := s!"if {strOfTerm multiplicity} = 0 || {strOfTerm multiplicity} = BabyBearPrime - 1 then True else undefined"
-           return (term, all_vars)
+      let terms := terms.getElems
+      guardWith (terms.size >= 20) "Instruction-related lookup without at least 20 parameters."
+      let (a0, a1, a2, a3) := (terms[7]!, terms[8]!, terms[9]!, terms[10]!)
+      let (b0, b1, b2, b3) := (terms[11]!, terms[12]!, terms[13]!, terms[14]!)
+      let (c0, c1, c2, c3) := (terms[15]!, terms[16]!, terms[17]!, terms[18]!)
+      let term := s!"\n    if {strOfTerm multiplicity} = 0 then True
+    else if {strOfTerm multiplicity} = 1 ∨ {strOfTerm multiplicity} = BabyBearPrime - 1
+         then {strOfTerm a0}.val < 256 ∧ {strOfTerm a1}.val < 256 ∧ {strOfTerm a2}.val < 256 ∧ {strOfTerm a3}.val < 256 ∧
+              {strOfTerm b0}.val < 256 ∧ {strOfTerm b1}.val < 256 ∧ {strOfTerm b2}.val < 256 ∧ {strOfTerm b3}.val < 256 ∧
+              {strOfTerm c0}.val < 256 ∧ {strOfTerm c1}.val < 256 ∧ {strOfTerm c2}.val < 256 ∧ {strOfTerm c3}.val < 256
+         else undefined"
+      return (term, all_vars)
     | .some 5 =>
       match terms.elemsAndSeps.size with
       -- 6 parameters: 0-6: AND, OR, XOR, SLL, U8Range, ShrCarry, LTU
-      | 11 => let ⟨[_, opcode, _, _, b, c]⟩ := terms.getElems | throw "Byte-related lookup does not have 6 parameters."
-              let term := strOfByteLookup multiplicity opcode b c
+      | 11 => let ⟨[_, opcode, a, _, b, c]⟩ := terms.getElems | throw "Impossible."
+              let term := strOfByteLookup multiplicity opcode a b c
               return (term, all_vars)
       -- 5 parameters: 7: MSB
-      | 9 => rejectImpossibleLength terms 5
-             throw s!"Unsupported lookup: MSB"
+      | 9 => let ⟨[_, opcode, a, _, b]⟩ := terms.getElems | throw "Impossible."
+             if .some 7 = opcode.raw.isNatLit?
+             then let term := strOfMSB multiplicity a b true 4
+                  return (term, all_vars)
+             else throw s!"Incorrect lookup (opcode, arity) combination: ({strOfTerm opcode}, 5)"
       -- 3 parameters: U16Range
-      | 5 => rejectImpossibleLength terms 3
-             throw s!"Unsupported lookup: U16Range"
+      | 5 => let ⟨[_, opcode, b]⟩ := terms.getElems | throw "Impossible."
+             if .some 8 = opcode.raw.isNatLit?
+             then let term := strOfU16Range multiplicity b true 4
+                  return (term, all_vars)
+             else throw s!"Incorrect lookup (opcode, arity) combination: ({strOfTerm opcode}, 5)"
       -- Incorrect number of parameters
       | _ => throw s!"Incorrect number of parameters provided to Byte-related lookup"
     | _ => throw s!"Unsupported lookup interaction kind: {strOfTerm interactionKind}"
@@ -73,7 +88,9 @@ private def translateConstraint (c : TSyntax `constraint) : Except String (Strin
     pure (strOfTerm t, bvsOfStx t)
   | stx => throw s!"Unrecognised constraint syntax: {stx}."
   where strOfTerm  (t : Term)     : String       := t.raw.prettyPrint.pretty
+
         strOfIdent (stx : Syntax) : String       := stx.getId.toString
+
         bvsOfStx   (stx : Syntax) : Array String := Id.run do
           let mut res : Array String := #[]
           for node in stx.topDown do
@@ -82,10 +99,9 @@ private def translateConstraint (c : TSyntax `constraint) : Except String (Strin
 
         guardWith (c : Bool) (ε : String) : Except String Unit :=
           if c then return () else throw ε
+
         rejectUnsupportedLookupVars (bvs : Array String) :=
           guardWith (bvs.all (·.startsWith "ML")) "Unsupported lookup variables."
-        rejectImpossibleLength {α} {s} (lookupArgs : Syntax.TSepArray α s) (expected : ℕ) :=
-          guardWith (lookupArgs.getElems.size == expected) "Impossible"
 
         newLineOrEmpty (newLine : Bool) : String := if newLine then "\n" else ""
         indent (n : ℕ) : String := String.replicate n ' '
@@ -95,12 +111,26 @@ private def translateConstraint (c : TSyntax `constraint) : Except String (Strin
 {indent (indentation + 2)}then {strOfTerm b}.val < 256 ∧ {strOfTerm c}.val < 256
 {indent (indentation + 2)}else if {strOfTerm multiplicity} = 0 then True else undefined"
 
-        strOfByteLookup (multiplicity opcode b c : Term) : String :=
+        strOfMSB (multiplicity a b : Term) (newLine : Bool) (indentation : ℕ) : String :=
+      s!"{newLineOrEmpty newLine}{if newLine then indent indentation else ""}if {strOfTerm multiplicity} = 1
+{indent (indentation + 2)}then {strOfTerm b}.val < 256 ∧
+{indent (indentation + 2)}     ({strOfTerm b}.val < 128 → {strOfTerm a} = 0) ∧
+{indent (indentation + 2)}     (128 ≤ {strOfTerm b}.val → {strOfTerm a} = 1)
+{indent (indentation + 2)}else if {strOfTerm multiplicity} = 0 then True else undefined"
+
+        strOfU16Range (multiplicity b : Term) (newLine : Bool) (indentation : ℕ) : String :=
+      s!"{newLineOrEmpty newLine}{if newLine then indent indentation else ""}if {strOfTerm multiplicity} = 1
+{indent (indentation + 2)}then {strOfTerm b}.val < 65536
+{indent (indentation + 2)}else if {strOfTerm multiplicity} = 0 then True else undefined"
+
+        strOfByteLookup (multiplicity opcode a b c : Term) : String :=
       s!"
     if {strOfTerm multiplicity} = 0 then True else
     if {strOfTerm multiplicity} = 1
     then match {strOfTerm opcode} with
          | 4 => {strOfU8Range multiplicity b c false 14}
+         | 7 => {strOfMSB multiplicity a b false 14}
+         | 8 => {strOfU16Range multiplicity b false 14}
          | _ => undefined
     else undefined"
 
