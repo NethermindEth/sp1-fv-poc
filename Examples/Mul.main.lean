@@ -1,9 +1,6 @@
 import Sp1Poc.Specs
 namespace Sp1
 
-set_option pp.parens true
-set_option pp.coercions.types true
-
 def spec_ML38_1_MUL
   (ML0 ML1 ML2 ML3 ML4 ML5 ML6 ML7 ML8 ML9 ML10 ML11 ML12 ML13 ML14 ML15 ML16 ML17 ML18 ML19 ML20 ML21 ML22 ML23 ML24 ML25 ML26 ML27 ML28 ML29 ML30 ML31 ML32 ML33 ML34 ML35 ML36 ML37 ML38 : BabyBear) : Prop :=
   (ML38 = 1) → (ML13 = 1) →
@@ -174,61 +171,54 @@ theorem conformance_ML38_ML13
     subst_eqs <;> simp at * <;> subst_eqs <;> simp at *
     simp [sub_eq_zero] at C20 C21 C22 C23 C24 C25 C26 C27; subst_eqs
     simp [sub_eq_zero] at C28 C30 C32 C34; subst_eqs
-    rcases C10 with ⟨ C46, C47 ⟩
-    rcases C11 with ⟨ C48, C49 ⟩
-    rcases C12 with ⟨ C50, C51 ⟩
-    rcases C13 with ⟨ C52, C53 ⟩
-    rcases C14 with ⟨ C54, C55, C56, C57, C58, C59, C60, C61, C62, C63, C64, C65 ⟩
-    constructor; exact C54
-    constructor; exact C55
-    constructor; exact C56
-    constructor; exact C57
-    constructor; exact C58
-    constructor; exact C59
-    constructor; exact C60
-    constructor; exact C61
-    constructor; exact C62
-    constructor; exact C63
-    constructor; exact C64
-    constructor; exact C65
+    clear C15 C16 C17 C29 C31 C33 C35 C38 C39 C40 C41 C42 C43 C45 C46
+    rcases C10 with ⟨ C15, C16 ⟩
+    rcases C11 with ⟨ C17, C18 ⟩
+    rcases C12 with ⟨ C19, C20 ⟩
+    rcases C13 with ⟨ C21, C22 ⟩
+    rcases C14 with ⟨ C23, C24, C25, C26, C27, C28, C29, C30, C31, C32, C33, C34 ⟩
+    constructor; exact C23
+    constructor; exact C24
+    constructor; exact C25
+    constructor; exact C26
+    constructor; exact C27
+    constructor; exact C28
+    constructor; exact C29
+    constructor; exact C30
+    constructor; exact C31
+    constructor; exact C32
+    constructor; exact C33
+    constructor; exact C34
     simp [BabyBearPrime, Fin.add_def, Fin.sub_def, Fin.mul_def]
     rw [@Nat.mod_eq_of_lt (ML14.val * _) 2013265921,
         @Nat.mod_eq_of_lt (ML15.val * _) 2013265921,
         @Nat.mod_eq_of_lt (ML16.val * _) 2013265921,
         @Nat.mod_eq_of_lt (ML17.val * _) 2013265921] <;> try omega
-    have H_carry_1: ML14.val * 256 ≤ ML5.val * ML9.val := by
-      simp [BabyBearPrime, Fin.sub_def, Fin.mul_def] at *; omega
-    have H_ub_14: ML14.val ≤ 255 := by nlinarith
 
-    have H_mod_1: ((2013265921 - (↑ML14 * ↑256)) + (↑ML5 *↑ ML9)) % 2013265921 = (ML5.val * ML9.val) - (ML14.val * ↑256) := by
-      have H_aux: (2013265921 - (↑ML14 * ↑256)) + (↑ML5 * ↑ML9) = (2013265921 + ((ML5.val * ML9.val) - (ML14.val * ↑256))) := by omega
-      have H_ub_59 : ML5.val * ML9.val ≤ 65025 := by nlinarith
-      omega
-    have WHY: @Fin.val (@OfNat.ofNat.{0} Nat 2013265921 (instOfNatNat 2013265921))
-                (@OfNat.ofNat.{0} Sp1.BabyBear 256
-                  (@Fin.instOfNat Sp1.BabyBearPrime Sp1.instNeZeroNatBabyBearPrime 256)) =
-              (@OfNat.ofNat.{0} Nat 256 (instOfNatNat 256)) := by simp [OfNat.ofNat]
-    rw [WHY] at *
-    rw [H_mod_1]
+    have H_ub_5_09 : ML5.val * ML9.val ≤ 65025 := by nlinarith
+    have H_ub_6_09 : ML6.val * ML9.val ≤ 65025 := by nlinarith
+    have H_ub_7_09 : ML7.val * ML9.val ≤ 65025 := by nlinarith
+    have H_ub_8_09 : ML8.val * ML9.val ≤ 65025 := by nlinarith
+    have H_ub_5_10 : ML5.val * ML10.val ≤ 65025 := by nlinarith
+    have H_ub_6_10 : ML6.val * ML10.val ≤ 65025 := by nlinarith
+    have H_ub_7_10 : ML7.val * ML10.val ≤ 65025 := by nlinarith
+    have H_ub_5_11 : ML5.val * ML11.val ≤ 65025 := by nlinarith
+    have H_ub_6_11 : ML6.val * ML11.val ≤ 65025 := by nlinarith
+    have H_ub_5_12 : ML5.val * ML12.val ≤ 65025 := by nlinarith
 
+    simp [BabyBearPrime, Fin.add_def, Fin.sub_def, Fin.mul_def] at *
 
+    have H_14_lb: ML14.val * 256 ≤ ML5.val * ML9.val := by omega
+    have H_14_ub: ML5.val * ML9.val < (ML14.val + 1) * 256 := by omega
+    have H_15_lb: ML15.val * 256 ≤ (ML5.val * ML10.val) + (ML6.val * ML9.val) + ML14.val := by omega
+    have H_15_ub: (ML5.val * ML10.val) + (ML6.val * ML9.val) + ML14 < (ML15.val + 1) * 256 := by omega
+    have H_16_lb: ML16.val * 256 ≤ (((↑ML5 * ↑ML11) + (↑ML6 * ↑ML10)) + (↑ML7 * ↑ML9)) + ↑ML15 := by omega
+    have H_16_ub: (((↑ML5 * ↑ML11) + (↑ML6 * ↑ML10)) + (↑ML7 * ↑ML9)) + ↑ML15 < (ML16.val + 1) * 256 := by omega
+    have H_17_lb: ML17.val * 256 ≤ ((((↑ML5 * ↑ML12) + (↑ML6 * ↑ML11)) + (↑ML7 * ↑ML10)) + (↑ML8 * ↑ML9)) + ↑ML16 := by omega
+    have H_17_ub: ((((↑ML5 * ↑ML12) + (↑ML6 * ↑ML11)) + (↑ML7 * ↑ML10)) + (↑ML8 * ↑ML9)) + ↑ML16 < (ML17.val + 1) * 256 := by omega
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    ring_nf
+    rw [Nat.mod_def]
+    omega
 
 end Sp1
