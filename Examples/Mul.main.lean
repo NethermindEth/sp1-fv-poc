@@ -176,18 +176,7 @@ theorem conformance_MUL
     rcases C11 with ⟨ C17, C18 ⟩
     rcases C12 with ⟨ C19, C20 ⟩
     rcases C13 with ⟨ C21, C22 ⟩
-    constructor; aesop
-    constructor; aesop
-    constructor; aesop
-    constructor; aesop
-    constructor; aesop
-    constructor; aesop
-    constructor; aesop
-    constructor; aesop
-    constructor; aesop
-    constructor; aesop
-    constructor; aesop
-    constructor; aesop
+    simp [*]
     simp [BabyBearPrime, Fin.add_def, Fin.sub_def, Fin.mul_def] at *
     rw [@Nat.mod_eq_of_lt (ML14.val * _) 2013265921,
         @Nat.mod_eq_of_lt (ML15.val * _) 2013265921,
