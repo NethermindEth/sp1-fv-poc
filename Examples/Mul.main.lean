@@ -190,29 +190,23 @@ theorem conformance_ML38_ML13
     constructor; exact C63
     constructor; exact C64
     constructor; exact C65
-    simp [BabyBearPrime, Fin.add_def, Fin.sub_def, Fin.mul_def, OfNat.ofNat]
-    rw [@Nat.mod_eq_of_lt (ML14.val * 256) 2013265921,
-        @Nat.mod_eq_of_lt (ML15.val * 256) 2013265921,
-        @Nat.mod_eq_of_lt (ML16.val * 256) 2013265921,
-        @Nat.mod_eq_of_lt (ML17.val * 256) 2013265921] <;> try linarith
-    have H_ub_0: ML14.val * 256 ≤ 16776960 := by linarith
-    have H_ub_1: ML5.val * ML9.val ≤ 65025 := by nlinarith
+    simp [BabyBearPrime, Fin.add_def, Fin.sub_def, Fin.mul_def]
+    rw [@Nat.mod_eq_of_lt (ML14.val * _) 2013265921,
+        @Nat.mod_eq_of_lt (ML15.val * _) 2013265921,
+        @Nat.mod_eq_of_lt (ML16.val * _) 2013265921,
+        @Nat.mod_eq_of_lt (ML17.val * _) 2013265921] <;> try omega
     have H_carry_1: ML14.val * 256 ≤ ML5.val * ML9.val := by
-      clear * - C02 C46 C58 C62 H_ub_0 H_ub_1
-      simp [BabyBearPrime, Fin.sub_def, Fin.mul_def, OfNat.ofNat] at *
-      rw [Nat.mod_eq_of_lt (a := ML14.val * 256)] at C46
-      . by_contra Hgt; simp at Hgt
-        have Hlt_1 : ((2013265921 - (ML14.val * 256)) + (ML5.val * ML9.val)) < 2013265921 := by
-          apply trans_lt_le (b := (2013265921 - (ML5.val * ML9.val)) + (ML5.val * ML9.val))
-          . apply lt_add_cancel_right <;> try omega
-            apply lt_sub_cancel_left <;> try linarith
-          . rw [nat_sub_add_cancel]; nlinarith
-        rw [Nat.mod_eq_of_lt] at C46 <;> try assumption
-        have Hcontra: ¬((2013265921 - (ML14.val * 256)) + (ML5.val * ML9.val)) < 1996488961 := by
-          simp [BabyBearPrime, Fin.sub_def, Fin.mul_def, OfNat.ofNat] at *
-          trans ((2013265921 - (ML14.val * 256)))
-          . clear * - C02 H_ub_0
-            omega
+      simp [BabyBearPrime, Fin.sub_def, Fin.mul_def] at *; omega
+    have H_ub_14: ML14.val ≤ 255 := by nlinarith
+    have H_mod_1: ((2013265921 - (ML14.val * ↑256)) + (ML5.val * ML9.val)) % 2013265921 = (ML5.val * ML9.val) - (ML14.val * ↑256) := by
+      have H_aux: (2013265921 - (ML14.val * ↑256)) + (ML5.val * ML9.val) = (2013265921 + ((ML5.val * ML9.val) - (ML14.val * ↑256))) := by omega
+      rw [H_aux, Nat.mod_eq_sub_mod] <;> [ skip; omega ]
+      rw [Nat.mod_eq_of_lt] <;> [ omega; skip ]
+      rw [Nat.add_sub_cancel_left]
+      trans 65536 <;> [ skip; omega ]
+      trans 65535 - (↑ML14 * 256) <;> [ skip; omega ]
+
+
 
 
 

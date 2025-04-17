@@ -19,11 +19,6 @@ instance : NoZeroDivisors BabyBear := by
   simp [ZMod] at this
   infer_instance
 
-lemma trans_lt_le {a b c : ℕ} : a < b → b ≤ c → a < c := by omega
-lemma nat_sub_add_cancel {a b : ℕ} : b ≤ a → (a - b) + b = a := by omega
-lemma lt_add_cancel_right {a b c : ℕ} : a < b → a + c < b + c := by omega
-lemma lt_sub_cancel_left {a b c : ℕ} : b < c → c < a → a - c < a - b := by omega
-
 syntax "PROOF" : term
 macro_rules | `(PROOF) => `(sorry)
 
