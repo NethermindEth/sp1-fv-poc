@@ -2,6 +2,7 @@ import Sp1Poc.Specs
 namespace Sp1
 
 set_option pp.parens true
+set_option pp.coercions.types true
 
 def spec_ML38_1_MUL
   (ML0 ML1 ML2 ML3 ML4 ML5 ML6 ML7 ML8 ML9 ML10 ML11 ML12 ML13 ML14 ML15 ML16 ML17 ML18 ML19 ML20 ML21 ML22 ML23 ML24 ML25 ML26 ML27 ML28 ML29 ML30 ML31 ML32 ML33 ML34 ML35 ML36 ML37 ML38 : BabyBear) : Prop :=
@@ -198,13 +199,18 @@ theorem conformance_ML38_ML13
     have H_carry_1: ML14.val * 256 ≤ ML5.val * ML9.val := by
       simp [BabyBearPrime, Fin.sub_def, Fin.mul_def] at *; omega
     have H_ub_14: ML14.val ≤ 255 := by nlinarith
-    have H_mod_1: ((2013265921 - (ML14.val * ↑256)) + (ML5.val * ML9.val)) % 2013265921 = (ML5.val * ML9.val) - (ML14.val * ↑256) := by
-      have H_aux: (2013265921 - (ML14.val * ↑256)) + (ML5.val * ML9.val) = (2013265921 + ((ML5.val * ML9.val) - (ML14.val * ↑256))) := by omega
-      rw [H_aux, Nat.mod_eq_sub_mod] <;> [ skip; omega ]
-      rw [Nat.mod_eq_of_lt] <;> [ omega; skip ]
-      rw [Nat.add_sub_cancel_left]
-      trans 65536 <;> [ skip; omega ]
-      trans 65535 - (↑ML14 * 256) <;> [ skip; omega ]
+
+    have H_mod_1: ((2013265921 - (↑ML14 * ↑256)) + (↑ML5 *↑ ML9)) % 2013265921 = (ML5.val * ML9.val) - (ML14.val * ↑256) := by
+      have H_aux: (2013265921 - (↑ML14 * ↑256)) + (↑ML5 * ↑ML9) = (2013265921 + ((ML5.val * ML9.val) - (ML14.val * ↑256))) := by omega
+      have H_ub_59 : ML5.val * ML9.val ≤ 65025 := by nlinarith
+      omega
+    have WHY: @Fin.val (@OfNat.ofNat.{0} Nat 2013265921 (instOfNatNat 2013265921))
+                (@OfNat.ofNat.{0} Sp1.BabyBear 256
+                  (@Fin.instOfNat Sp1.BabyBearPrime Sp1.instNeZeroNatBabyBearPrime 256)) =
+              (@OfNat.ofNat.{0} Nat 256 (instOfNatNat 256)) := by simp [OfNat.ofNat]
+    rw [WHY] at *
+    rw [H_mod_1]
+
 
 
 
