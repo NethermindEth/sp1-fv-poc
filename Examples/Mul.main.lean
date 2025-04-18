@@ -125,8 +125,9 @@ theorem conformance_MUL
   (C14 :
     if (ML38 * 2013265920) = 0 then True
     else if (ML38 * 2013265920) = 1 ∨ (ML38 * 2013265920) = BabyBearPrime - 1
-         -- No further semantic information from this lookup
-         then True
+         then ML1.val < 256 ∧ ML2.val < 256 ∧ ML3.val < 256 ∧ ML4.val < 256 ∧
+              ML5.val < 256 ∧ ML6.val < 256 ∧ ML7.val < 256 ∧ ML8.val < 256 ∧
+              ML9.val < 256 ∧ ML10.val < 256 ∧ ML11.val < 256 ∧ ML12.val < 256
          else undefined)
   (C15 : True)
   (C16 : True)
@@ -182,51 +183,26 @@ theorem conformance_MUL
         @Nat.mod_eq_of_lt (ML16.val * _) 2013265921,
         @Nat.mod_eq_of_lt (ML17.val * _) 2013265921] <;> try omega
 
-    have Hlt_ML14 : ML14.val * ↑256 ≤ 16776960 := by omega
-    rw [@Nat.mod_eq_of_lt ( ML14.val * _)] at C15 <;> [ skip; omega ]
+    have H_ub_5_09 : ML5.val * ML9.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
+    have H_ub_6_09 : ML6.val * ML9.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
+    have H_ub_7_09 : ML7.val * ML9.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
+    have H_ub_8_09 : ML8.val * ML9.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
+    have H_ub_5_10 : ML5.val * ML10.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
+    have H_ub_6_10 : ML6.val * ML10.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
+    have H_ub_7_10 : ML7.val * ML10.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
+    have H_ub_5_11 : ML5.val * ML11.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
+    have H_ub_6_11 : ML6.val * ML11.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
+    have H_ub_5_12 : ML5.val * ML12.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
+
     have H_14_lb: ML14.val * 256 ≤ ML5.val * ML9.val := by omega
+    have H_14_ub: ML5.val * ML9.val < (ML14.val + 1) * 256 := by omega
+    have H_15_lb: ML15.val * 256 ≤ (ML5.val * ML10.val) + (ML6.val * ML9.val) + ML14.val := by omega
+    have H_15_ub: (ML5.val * ML10.val) + (ML6.val * ML9.val) + ML14 < (ML15.val + 1) * 256 := by omega
+    have H_16_lb: ML16.val * 256 ≤ (((↑ML5 * ↑ML11) + (↑ML6 * ↑ML10)) + (↑ML7 * ↑ML9)) + ↑ML15 := by omega
+    have H_16_ub: (((↑ML5 * ↑ML11) + (↑ML6 * ↑ML10)) + (↑ML7 * ↑ML9)) + ↑ML15 < (ML16.val + 1) * 256 := by omega
+    have H_17_lb: ML17.val * 256 ≤ ((((↑ML5 * ↑ML12) + (↑ML6 * ↑ML11)) + (↑ML7 * ↑ML10)) + (↑ML8 * ↑ML9)) + ↑ML16 := by omega
+    have H_17_ub: ((((↑ML5 * ↑ML12) + (↑ML6 * ↑ML11)) + (↑ML7 * ↑ML10)) + (↑ML8 * ↑ML9)) + ↑ML16 < (ML17.val + 1) * 256 := by omega
 
-    by_cases Hinst: ML5.val = 1024 ∧ ML9.val = 1024 ∧ ML14 = 4096
-    rcases Hinst with ⟨ H5, H9, H14 ⟩
-    simp [H5, H9, H14] at *
-    by_cases Hinst: ML6.val = 0 ∧ ML7.val = 0 ∧ ML8 = 0 ∧ ML10.val = 0 ∧ ML11.val = 0 ∧ ML12 = 0
-    rcases Hinst with ⟨ H6, H7, H8, H10, H11, H12 ⟩
-    simp [H6, H7, H8, H10, H11, H12] at *
-    subst_eqs
-    by_cases Hinst: ML16.val = 0 ∧ ML17.val = 0 ∧ ML18 = 0 ∧ ML19.val = 0 ∧ ML20.val = 0 ∧ ML21.val = 0
-    rcases Hinst with ⟨ H16, H17, H18, H19, H20, H21 ⟩
-    simp [H16, H17, H18, H19, H20, H21] at *
-    simp_arith at H_14_lb C02 Hlt_ML14 C15
-    by_cases H15: ML15.val = 16
-    simp [H15] at *
-    simp_arith at C16
-
-
-
-
-
-
-
-    -- have H_ub_5_09 : ML5.val * ML9.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
-    -- have H_ub_6_09 : ML6.val * ML9.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
-    -- have H_ub_7_09 : ML7.val * ML9.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
-    -- have H_ub_8_09 : ML8.val * ML9.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
-    -- have H_ub_5_10 : ML5.val * ML10.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
-    -- have H_ub_6_10 : ML6.val * ML10.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
-    -- have H_ub_7_10 : ML7.val * ML10.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
-    -- have H_ub_5_11 : ML5.val * ML11.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
-    -- have H_ub_6_11 : ML6.val * ML11.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
-    -- have H_ub_5_12 : ML5.val * ML12.val ≤ 255 * 255 := by apply mul_le_mul <;> omega
-
-    -- have H_14_lb: ML14.val * 256 ≤ ML5.val * ML9.val := by omega
-    -- have H_14_ub: ML5.val * ML9.val < (ML14.val + 1) * 256 := by omega
-    -- have H_15_lb: ML15.val * 256 ≤ (ML5.val * ML10.val) + (ML6.val * ML9.val) + ML14.val := by omega
-    -- have H_15_ub: (ML5.val * ML10.val) + (ML6.val * ML9.val) + ML14 < (ML15.val + 1) * 256 := by omega
-    -- have H_16_lb: ML16.val * 256 ≤ (((↑ML5 * ↑ML11) + (↑ML6 * ↑ML10)) + (↑ML7 * ↑ML9)) + ↑ML15 := by omega
-    -- have H_16_ub: (((↑ML5 * ↑ML11) + (↑ML6 * ↑ML10)) + (↑ML7 * ↑ML9)) + ↑ML15 < (ML16.val + 1) * 256 := by omega
-    -- have H_17_lb: ML17.val * 256 ≤ ((((↑ML5 * ↑ML12) + (↑ML6 * ↑ML11)) + (↑ML7 * ↑ML10)) + (↑ML8 * ↑ML9)) + ↑ML16 := by omega
-    -- have H_17_ub: ((((↑ML5 * ↑ML12) + (↑ML6 * ↑ML11)) + (↑ML7 * ↑ML10)) + (↑ML8 * ↑ML9)) + ↑ML16 < (ML17.val + 1) * 256 := by omega
-
-    -- ring_nf; omega
+    ring_nf; omega
 
 end Sp1
