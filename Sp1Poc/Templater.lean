@@ -46,9 +46,13 @@ private def translateConstraint (c : TSyntax `constraint) : Except String (Strin
     | .some 3 =>
       let terms := terms.getElems
       guardWith (terms.size >= 20) "Instruction-related lookup without at least 20 parameters."
+      -- Output
       let (a0, a1, a2, a3) := (terms[7]!, terms[8]!, terms[9]!, terms[10]!)
+      -- Input 1
       let (b0, b1, b2, b3) := (terms[11]!, terms[12]!, terms[13]!, terms[14]!)
+      -- Input 2
       let (c0, c1, c2, c3) := (terms[15]!, terms[16]!, terms[17]!, terms[18]!)
+      -- Inputs and output are 32-bit, split into bytes
       let term := s!"\n    if {strOfTerm multiplicity} = 0 then True
     else if {strOfTerm multiplicity} = 1 ∨ {strOfTerm multiplicity} = BabyBearPrime - 1
          then {strOfTerm a0}.val < 256 ∧ {strOfTerm a1}.val < 256 ∧ {strOfTerm a2}.val < 256 ∧ {strOfTerm a3}.val < 256 ∧
