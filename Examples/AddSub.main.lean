@@ -2,13 +2,13 @@ import Sp1Poc.Specs
 
 namespace Sp1
 
-def spec_ML16_1
+def spec_ADD
   (ML0 ML1 ML2 ML3 ML4 ML5 ML6 ML7 ML8 ML9 ML10 ML11 ML12 ML13 ML14 ML15 ML16 ML17 ML18 : BabyBear) : Prop :=
-  (ML16 = 1) →
+  (ML16 = 1) → (ML17 = 0) →
     spec_32_bit_wrap_add ML1 ML2 ML3 ML4 ML8 ML9 ML10 ML11 ML12 ML13 ML14 ML15
 
-set_option maxHeartbeats 1000000 in
-theorem conformance_ML16_1
+set_option maxHeartbeats 5000000 in
+theorem conformance_ADD
   {ML0 ML1 ML2 ML3 ML4 ML5 ML6 ML7 ML8 ML9 ML10 ML11 ML12 ML13 ML14 ML15 ML16 ML17 ML18 : BabyBear}
   (C00 :
     if ML16 = 0 then True else
@@ -16,6 +16,14 @@ theorem conformance_ML16_1
     then match 4 with
          | 4 => if ML16 = 1
                 then ML8.val < 256 ∧ ML9.val < 256
+                else if ML16 = 0 then True else undefined
+         | 7 => if ML16 = 1
+                then ML8.val < 256 ∧
+                     (ML8.val < 128 → 0 = 0) ∧
+                     (128 ≤ ML8.val → 0 = 1)
+                else if ML16 = 0 then True else undefined
+         | 8 => if ML16 = 1
+                then ML8.val < 65536
                 else if ML16 = 0 then True else undefined
          | _ => undefined
     else undefined)
@@ -26,6 +34,14 @@ theorem conformance_ML16_1
          | 4 => if ML16 = 1
                 then ML10.val < 256 ∧ ML11.val < 256
                 else if ML16 = 0 then True else undefined
+         | 7 => if ML16 = 1
+                then ML10.val < 256 ∧
+                     (ML10.val < 128 → 0 = 0) ∧
+                     (128 ≤ ML10.val → 0 = 1)
+                else if ML16 = 0 then True else undefined
+         | 8 => if ML16 = 1
+                then ML10.val < 65536
+                else if ML16 = 0 then True else undefined
          | _ => undefined
     else undefined)
   (C02 :
@@ -34,6 +50,14 @@ theorem conformance_ML16_1
     then match 4 with
          | 4 => if ML16 = 1
                 then ML12.val < 256 ∧ ML13.val < 256
+                else if ML16 = 0 then True else undefined
+         | 7 => if ML16 = 1
+                then ML12.val < 256 ∧
+                     (ML12.val < 128 → 0 = 0) ∧
+                     (128 ≤ ML12.val → 0 = 1)
+                else if ML16 = 0 then True else undefined
+         | 8 => if ML16 = 1
+                then ML12.val < 65536
                 else if ML16 = 0 then True else undefined
          | _ => undefined
     else undefined)
@@ -44,6 +68,14 @@ theorem conformance_ML16_1
          | 4 => if ML16 = 1
                 then ML14.val < 256 ∧ ML15.val < 256
                 else if ML16 = 0 then True else undefined
+         | 7 => if ML16 = 1
+                then ML14.val < 256 ∧
+                     (ML14.val < 128 → 0 = 0) ∧
+                     (128 ≤ ML14.val → 0 = 1)
+                else if ML16 = 0 then True else undefined
+         | 8 => if ML16 = 1
+                then ML14.val < 65536
+                else if ML16 = 0 then True else undefined
          | _ => undefined
     else undefined)
   (C04 :
@@ -52,6 +84,14 @@ theorem conformance_ML16_1
     then match 4 with
          | 4 => if ML16 = 1
                 then ML1.val < 256 ∧ ML2.val < 256
+                else if ML16 = 0 then True else undefined
+         | 7 => if ML16 = 1
+                then ML1.val < 256 ∧
+                     (ML1.val < 128 → 0 = 0) ∧
+                     (128 ≤ ML1.val → 0 = 1)
+                else if ML16 = 0 then True else undefined
+         | 8 => if ML16 = 1
+                then ML1.val < 65536
                 else if ML16 = 0 then True else undefined
          | _ => undefined
     else undefined)
@@ -62,10 +102,30 @@ theorem conformance_ML16_1
          | 4 => if ML16 = 1
                 then ML3.val < 256 ∧ ML4.val < 256
                 else if ML16 = 0 then True else undefined
+         | 7 => if ML16 = 1
+                then ML3.val < 256 ∧
+                     (ML3.val < 128 → 0 = 0) ∧
+                     (128 ≤ ML3.val → 0 = 1)
+                else if ML16 = 0 then True else undefined
+         | 8 => if ML16 = 1
+                then ML3.val < 65536
+                else if ML16 = 0 then True else undefined
          | _ => undefined
     else undefined)
-  (C06 : if (ML17 * 2013265920) = 0 || (ML17 * 2013265920) = BabyBearPrime - 1 then True else undefined)
-  (C07 : if (ML18 * 2013265920) = 0 || (ML18 * 2013265920) = BabyBearPrime - 1 then True else undefined)
+  (C06 :
+    if (ML17 * 2013265920) = 0 then True
+    else if (ML17 * 2013265920) = 1 ∨ (ML17 * 2013265920) = BabyBearPrime - 1
+         then ML1.val < 256 ∧ ML2.val < 256 ∧ ML3.val < 256 ∧ ML4.val < 256 ∧
+              ML8.val < 256 ∧ ML9.val < 256 ∧ ML10.val < 256 ∧ ML11.val < 256 ∧
+              ML12.val < 256 ∧ ML13.val < 256 ∧ ML14.val < 256 ∧ ML15.val < 256
+         else undefined)
+  (C07 :
+    if (ML18 * 2013265920) = 0 then True
+    else if (ML18 * 2013265920) = 1 ∨ (ML18 * 2013265920) = BabyBearPrime - 1
+         then ML8.val < 256 ∧ ML9.val < 256 ∧ ML10.val < 256 ∧ ML11.val < 256 ∧
+              ML1.val < 256 ∧ ML2.val < 256 ∧ ML3.val < 256 ∧ ML4.val < 256 ∧
+              ML12.val < 256 ∧ ML13.val < 256 ∧ ML14.val < 256 ∧ ML15.val < 256
+         else undefined)
   (C08 : True)
   (C09 : True)
   (C10 : True)
@@ -86,8 +146,8 @@ theorem conformance_ML16_1
   (C25 : (ML16 * (ML6 * (ML6 - 1))) = 0)
   (C26 : (ML16 * (ML7 * (ML7 - 1))) = 0)
   (C27 : (ML16 * (ML16 * (ML16 - 1))) = 0)
-  (C28 : (ML16 * ((ML17 + ML18) - 1)) = 0) : spec_ML16_1 ML0 ML1 ML2 ML3 ML4 ML5 ML6 ML7 ML8 ML9 ML10 ML11 ML12 ML13 ML14 ML15 ML16 ML17 ML18 := by
-    unfold spec_ML16_1; intro HML16; unfold spec_32_bit_wrap_add
+  (C28 : (ML16 * ((ML17 + ML18) - 1)) = 0) : spec_ADD ML0 ML1 ML2 ML3 ML4 ML5 ML6 ML7 ML8 ML9 ML10 ML11 ML12 ML13 ML14 ML15 ML16 ML17 ML18 := by
+    unfold spec_ADD; intro HML16; unfold spec_32_bit_wrap_add
     subst_eqs; simp [sub_eq_zero (b := (1 : BabyBear))] at *
     rcases C24 <;> rcases C25 <;> rcases C26 <;> subst_eqs <;>
     simp [BabyBearPrime, Fin.add_def, Fin.sub_def] at * <;>
