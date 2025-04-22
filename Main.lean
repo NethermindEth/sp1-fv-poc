@@ -1,4 +1,4 @@
-import Sp1Poc.Cli
+import Sp1Poc
 import Lake
 import Lean.Util.Path
 
