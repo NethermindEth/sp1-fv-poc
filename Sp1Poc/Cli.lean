@@ -4,8 +4,6 @@ import Sp1Poc.Templater
 
 namespace Sp1
 
-def RustFolderRoot : System.FilePath := "./RustExtractor"
-
 def GeneratedFolderRoot : System.FilePath := "./Generated"
 
 section
