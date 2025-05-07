@@ -1,1 +1,5 @@
 /.lake
+/Generated/*
+Generated.lean
+
+.DS_Store
