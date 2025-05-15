@@ -1,5 +1,5 @@
-import Cli
-import Lake
+import Cli.Basic
+import Lake.Util.Lift
 import Sp1Poc.Templater
 
 namespace Sp1

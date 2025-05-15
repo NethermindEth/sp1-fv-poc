@@ -1,14 +1,14 @@
 import Mathlib.Algebra.Field.ZMod
-import Mathlib.Algebra.GroupWithZero.Defs
-import Mathlib.Algebra.Ring.Defs
-import Mathlib.Data.Nat.Prime.Defs
-import Mathlib.Data.ZMod.Defs
-import Mathlib.Tactic
+import Mathlib.Tactic.NormNum.Prime
 
 namespace Sp1
 
 abbrev BabyBearPrime : ℕ := 2013265921
-axiom prime_BabyBearPrime : Nat.Prime BabyBearPrime -- := by norm_num
+
+macro "prime_proof" : term =>
+  if System.Platform.isOSX then `(sorry) else `(by norm_num)
+
+lemma prime_BabyBearPrime : Nat.Prime BabyBearPrime := prime_proof
 
 abbrev BabyBear : Type := Fin BabyBearPrime
 

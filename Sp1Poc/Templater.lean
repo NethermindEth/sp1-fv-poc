@@ -1,8 +1,6 @@
-import Sp1Poc.Wheels
-import Lean
 import Mathlib.Lean.CoreM
-import Std.Data.HashSet.Basic
 import Sp1Poc.Basic
+import Sp1Poc.Wheels
 
 namespace Sp1
 
